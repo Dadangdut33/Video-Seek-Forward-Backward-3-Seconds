@@ -8,31 +8,67 @@
 // @include *
 // @run-at document-load
 // ==/UserScript==
- 
-(function () {
-	"use strict";
- 
-	var videos = document.getElementsByTagName("video"); // get all video
- 
-	// Store the video element in an array
-	const videoItem = [];
-	for (let i = 0; i < videos.length; i++) {
-		videoItem.push(videos.item(i));
-	}
- 
-	// Loop through the video element array
-	videoItem.forEach(function (video) {
-		// add event listener to the window with key event that binds to the video
-		window.addEventListener("keydown", function (event) {
-			// use https://keycode.info/ to find the keycode
-			// check if key press is ctrl + ]
-			if (event.ctrlKey && event.keyCode === 221) {
-				video.currentTime -= 3; // time to seek backward
+
+(async function () {
+	("use strict");
+
+	// * use https://keycode.info/ to find the keycode
+	// * Default key is:
+	// * ctrl + ] to seek backward
+	// * ctrl + \ to seek forward
+
+	let foundVideo = false,
+		tries = 0,
+		videos,
+		checkLimit = 10, // Set the number of tries to find the video element
+		seekBackwardFor = 3, // Set the time to seek backward in seconds
+		seekForwardFor = 3, // Set the time to seek forward in seconds
+		seekBackwardKeyCode = 221, // Set the key code to seek backward (ctrl + seekBackwardKeyCode)
+		seekForwardKeyCode = 220; // Set the key code to seek forward (ctrl + seekForwardKeyCode)
+
+	// Check for video element
+	let checkInterval = setInterval(function () {
+		if (foundVideo) {
+			clearInterval(checkInterval);
+			return;
+		}
+
+		console.log(`[${new Date()}] Checking for video element`);
+		videos = document.getElementsByTagName("video");
+
+		if (videos.length > 0) {
+			foundVideo = true;
+
+			// Store the video element in an array
+			const videoItem = [];
+			for (let i = 0; i < videos.length; i++) {
+				videoItem.push(videos.item(i));
 			}
-			// check if key press is ctrl + \
-			if (event.ctrlKey && event.keyCode === 220) {
-				video.currentTime += 3; // time to seek forward
-			}
-		});
-	});
+
+			// Loop through the video element array
+			videoItem.forEach(function (video) {
+				// add event listener to the window with key event that binds to the video
+				window.addEventListener("keydown", function (event) {
+					if (event.ctrlKey && event.keyCode === seekBackwardKeyCode) {
+						video.currentTime -= seekBackwardFor; // time to seek backward
+					}
+
+					if (event.ctrlKey && event.keyCode === seekForwardKeyCode) {
+						video.currentTime += seekForwardFor; // time to seek forward
+					}
+				});
+			});
+
+			return; // stop if found
+		}
+
+		tries++;
+
+		if (tries < checkLimit) {
+			console.log(`[${new Date()}] No video found, trying again in 5 seconds`);
+		} else {
+			console.log(`[${new Date()}] No video found, giving up`);
+			clearInterval(checkInterval);
+		}
+	}, 5000);
 })();
