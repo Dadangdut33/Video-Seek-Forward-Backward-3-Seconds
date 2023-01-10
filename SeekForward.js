@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Video Seek Forward Backward 3 Seconds
 // @namespace    https://github.com/Dadangdut33/Video-Seek-Forward-Backward-3-Seconds
-// @version      1.0
+// @version      1.1
 // @description  Use ctrl + \ and ctrl + ] to seek video forward and backward 3 seconds. To seek forward use ctrl + \. To seek backward use ctrl + ]. You can modify the key and the seek time to your desire easily in the script.
 // @author       Dadangdut33
 // @license Unlicense
